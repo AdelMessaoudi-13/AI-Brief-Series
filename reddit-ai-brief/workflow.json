@@ -1,0 +1,203 @@
+{
+  "name": "Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 18,
+              "triggerAtMinute": null
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "277db57f-042c-48ab-bdbc-9be56d14ddcc",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "subreddit": "ArtificialIntelligence+MachineLearning+OpenAI+DeepLearning+aipapers+LocalLLaMA+HuggingFace+AI_Startup",
+        "keyword": "Artificial Intelligence",
+        "limit": 20,
+        "additionalFields": {
+          "sort": "new"
+        }
+      },
+      "type": "n8n-nodes-base.reddit",
+      "typeVersion": 1,
+      "position": [
+        220,
+        0
+      ],
+      "id": "3fbb2abd-a95e-4119-9820-c00ffdc8416b",
+      "name": "Reddit",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Voici des extraits de posts Reddit récents concernant l’intelligence artificielle :\n\n{{ $json.selftext }}\n\nPeux-tu produire un **résumé global, structuré et clair, en français**, à partir de ces contenus ? \n\nLe résumé doit rester concis, dans une limite équivalente à environ 500 mots.\n\nChaque point abordé doit être **légèrement développé**, avec un **minimum de contexte** ou d’explication, pour que le lecteur comprenne l’enjeu ou l’idée principale.  \nÉvite les les listes à puces ou les énumérations sèches. Privilégie des **paragraphes courts et clairs**, même si tu regroupes plusieurs sujets dans une même section.\n\nAccorde une attention particulière aux références mentionnées (blogs, articles, papiers, outils…). Si des **références sont mentionnées** (blogs, articles, papiers scientifiques, sites web, outils, etc.), merci de les **intégrer dans le résumé** sous forme de lien, lorsque c’est possible."
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        600,
+        0
+      ],
+      "id": "67261257-c7a8-4c65-9a3b-c1b8b361ae27",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "selftext"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        400,
+        0
+      ],
+      "id": "86662b17-bad9-4fbc-ac2a-a7d82c57541b",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "sendTo": "votre.email@exemple.com",
+        "subject": "=📬 Daily News IA (Reddit) – {{ $now.format(\"dd MMM yyyy\") }}",
+        "message": "=<!DOCTYPE html>\n<html lang=\"fr\">\n<head>\n  <meta charset=\"UTF-8\" />\n  <title>🧠 Flash IA quotidien — Résumé des actualités IA (Reddit)</title>\n</head>\n<body style=\"font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 30px;\">\n  <div style=\"max-width: 700px; margin: auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);\">\n    \n    <h2 style=\"color: #4A90E2;\">🧠 Flash IA quotidien — Résumé des actualités IA (Reddit)</h2>\n    <p style=\"color: #666; font-size: 14px;\">\n      Rapport du <strong>{{ $now.format(\"dd MMM yyyy\") }}</strong>\n    </p>\n\n    <!-- Contenu HTML généré par le LLM -->\n    <div style=\"margin-top: 20px; color: #333; line-height: 1.6; font-size: 15px;\">\n      {{ $json.data }}\n    </div>\n\n    <hr style=\"margin-top: 30px; border: none; border-top: 1px solid #eee;\" />\n\n    <p style=\"font-size: 13px; color: #999;\">\n  Ce résumé est proposé par un agent IA développé par Adel Messaoudi, à partir de contenus Reddit.  \n  <br>\n  📡 Une veille fine et quotidienne sur l’intelligence artificielle, conçue pour ne retenir que l’essentiel.\n</p>\n\n\n\n  </div>\n</body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1260,
+        0
+      ],
+      "id": "36e86378-47d6-4ca2-b511-3c7d2bd4db45",
+      "name": "Gmail",
+      "webhookId": "5d610864-9db9-4847-8f15-3dde53e8b13e"
+    },
+    {
+      "parameters": {
+        "mode": "markdownToHtml",
+        "markdown": "={{ $json.text}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        0
+      ],
+      "id": "93cd2661-5915-44d8-885f-014c743cb8ce",
+      "name": "Markdown"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        600,
+        220
+      ],
+      "id": "d76443f9-ace0-42ce-8600-2e4fba22aa6e",
+      "name": "DeepSeek Chat Model"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Reddit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reddit": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Markdown": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2e5fbf10-17a0-42a9-bb8f-13e354bd7b98",
+  "meta": {
+    "instanceId": "ae6e9c4cc37deb7843e8608dcd40b22f038a019b8ba630eab889e8c72021c8cf"
+  },
+  "id": "KkEoobt2f4jMQqcO",
+  "tags": []
+}
