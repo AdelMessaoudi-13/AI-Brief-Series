@@ -1,0 +1,274 @@
+{
+  "name": "Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "maxItems": 7
+      },
+      "id": "3ba036da-ad26-4338-9031-23765f84087d",
+      "name": "Limit to first ",
+      "type": "n8n-nodes-base.limit",
+      "position": [
+        3120,
+        0
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "sendTo": "votre.email@exemple.com",
+        "subject": "=📬 Daily News IA (VentureBeat) – {{ $now.format(\"dd MMM yyyy\") }}",
+        "message": "=<!DOCTYPE html>\n<html lang=\"fr\">\n<head>\n  <meta charset=\"UTF-8\" />\n  <title>🧠 Flash IA quotidien — Résumé des actualités IA (VentureBeat)</title>\n</head>\n<body style=\"font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 30px;\">\n  <div style=\"max-width: 700px; margin: auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);\">\n    \n    <h2 style=\"color: #4A90E2;\">🧠 Flash IA quotidien — Résumé des actualités IA (VentureBeat)</h2>\n    <p style=\"color: #666; font-size: 14px;\">\n      Rapport du <strong>{{ $now.format(\"dd MMM yyyy\") }}</strong>\n    </p>\n\n    <!-- Contenu HTML généré par le LLM -->\n    <div style=\"margin-top: 20px; color: #333; line-height: 1.6; font-size: 15px;\">\n      {{ $json.data }}\n    </div>\n\n    <hr style=\"margin-top: 30px; border: none; border-top: 1px solid #eee;\" />\n\n    <p style=\"font-size: 13px; color: #999;\">\n      Ce résumé a été généré automatiquement à partir de VentureBeat, par un agent IA conçu par Adel Messaoudi.\n      <br />\n      📡 Une veille quotidienne sur l’intelligence artificielle, livrée directement dans votre boîte mail.\n    </p>\n\n  </div>\n</body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        4620,
+        0
+      ],
+      "id": "5294ef20-187c-423a-a451-843f1d824b0b",
+      "name": "Gmail1",
+      "webhookId": "9b69d4a4-3254-456c-a7bc-db444ea4cd0a"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Tu es un assistant qui résume l’actualité en intelligence artificielle à partir de plusieurs résumés d’articles.\n\nTa tâche est de produire un **résumé global, fluide et informatif en français**, décrivant **l’ensemble des sujets traités** dans la journée.\n\nÀ la fin, ajoute une section intitulée **Références**, contenant la **liste des titres d’articles** suivis de leurs **liens**.\n\n---\n\n{{ $json.fullText }}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        3860,
+        0
+      ],
+      "id": "c35a9289-55c2-453f-a6c4-296c1d62ff20",
+      "name": "Basic LLM Chain1"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 18
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        2500,
+        0
+      ],
+      "id": "a12cbcb5-3772-4eeb-9639-599fc6b98a12",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0fa4ddb2-4cea-4c86-8564-e4b5edb33648",
+              "name": "fullText",
+              "value": "=📄 Titre : {{ $json.title }}\n🔗 Lien : {{ $json.link || $json.guid || \"https://arxiv.org/abs/\" + ($json.id || \"\").split(\"/\").pop() }}\n📜 Résumé original : {{ $json.content }}\n",
+              "type": "string"
+            },
+            {
+              "id": "062c9e06-96e5-4d79-8d0d-6491ca45e577",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "23abc85b-00f0-4fe6-9791-7d7c0435a1bf",
+              "name": "link",
+              "value": "={{ $json.link || $json.guid || \"https://arxiv.org/abs/\" + ($json.id || \"\").split(\"/\").pop() }}",
+              "type": "string"
+            },
+            {
+              "id": "a78da768-a3d6-4de9-9b51-96b10e870d97",
+              "name": "date",
+              "value": "={{ $json.pubDate }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3340,
+        0
+      ],
+      "id": "2068c98d-01f2-43ce-92df-306be35e6e2d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "url": "https://venturebeat.com/category/ai/feed/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        2840,
+        0
+      ],
+      "id": "aaba4803-5e7d-4b47-b957-2793c23883eb",
+      "name": "RSS Read"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        3740,
+        220
+      ],
+      "id": "16425115-4ac0-4cf9-ab3f-42e354e91057",
+      "name": "Google Gemini Chat Model"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "fullText"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        3600,
+        0
+      ],
+      "id": "15aca237-817a-47dd-b64e-bb80597d9814",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "mode": "markdownToHtml",
+        "markdown": "={{ $json.text}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        4300,
+        0
+      ],
+      "id": "23ee82bc-1fe9-42c4-969a-1bff27a60577",
+      "name": "Markdown"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Limit to first ": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain1": {
+      "main": [
+        [
+          {
+            "node": "Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Limit to first ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Markdown": {
+      "main": [
+        [
+          {
+            "node": "Gmail1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c82e8bd8-5ab1-4e24-98a3-7d838f14c459",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ae6e9c4cc37deb7843e8608dcd40b22f038a019b8ba630eab889e8c72021c8cf"
+  },
+  "id": "KkEoobt2f4jMQqcO",
+  "tags": []
+}
