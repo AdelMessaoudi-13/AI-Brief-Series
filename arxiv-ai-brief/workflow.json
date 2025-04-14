@@ -1,0 +1,309 @@
+{
+  "name": "workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "maxItems": 5
+      },
+      "id": "8ff31ab2-f757-4a27-99a9-04768539a198",
+      "name": "Limit to first ",
+      "type": "n8n-nodes-base.limit",
+      "position": [
+        24480,
+        5220
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 18
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        23880,
+        5220
+      ],
+      "id": "996c94a6-98ad-47d6-bbfa-041c772eb2ed",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://export.arxiv.org/rss/cs.AI",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        24180,
+        5220
+      ],
+      "id": "c0e2efe3-af8c-4276-9e3f-4cfc6489de3b",
+      "name": "RSS Read"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0fa4ddb2-4cea-4c86-8564-e4b5edb33648",
+              "name": "fullText",
+              "value": "=📄 Title: {{ $json.title }}\n🔗 Link: {{ $json.link || $json.guid || \"https://arxiv.org/abs/\" + ($json.id || \"\").split(\"/\").pop() }}\n📜 Original abstract: {{ $json.content }}\n",
+              "type": "string"
+            },
+            {
+              "id": "062c9e06-96e5-4d79-8d0d-6491ca45e577",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "23abc85b-00f0-4fe6-9791-7d7c0435a1bf",
+              "name": "link",
+              "value": "={{ $json.link || $json.guid || \"https://arxiv.org/abs/\" + ($json.id || \"\").split(\"/\").pop() }}",
+              "type": "string"
+            },
+            {
+              "id": "a78da768-a3d6-4de9-9b51-96b10e870d97",
+              "name": "date",
+              "value": "={{ $json.pubDate }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        24840,
+        5220
+      ],
+      "id": "0a0fb8a4-8ab9-417c-a70c-ab8509e7c102",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        25300,
+        5540
+      ],
+      "id": "4c84fc51-f44b-4fb4-9f09-a1a2f2ec2e6f",
+      "name": "DeepSeek Chat Model"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an expert in artificial intelligence.\n\nHere is a scientific summary from an article published on ArXiv.\n\nYour task is to produce a **clear and well-structured summary in English**.\n\n---\n\n{{ $json.fullText }}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.5,
+      "position": [
+        25360,
+        5280
+      ],
+      "id": "1e7b20a5-5cf8-4397-951a-42231f7add4b",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        25880,
+        5220
+      ],
+      "id": "96e067f9-713b-42ca-9092-813bdc295299",
+      "name": "Merge",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fb78e4ea-7be5-499e-8dc8-2044dffc0bf5",
+              "name": "allSummaries",
+              "value": "={{\n  $items().map((e, i) => \n    \"🧠 Summary \" + (i + 1) +\n    \"\\n📄 Title: \" + (e.json.title || \"Missing title\") +\n    \"\\n🔗 Link: \" + (e.json.link || \"Missing link\") +\n    \"\\n 📅 Date: \" + e.json.date +\n    \"\\n📝 Summary: \" + e.json.text \n  ).join(\"\\n\\n\")\n}}\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        26140,
+        5220
+      ],
+      "id": "58bf637f-083d-4172-823f-0e7eb652096f",
+      "name": "Edit Fields1",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "sendTo": "your.email@example.com",
+        "subject": "=📬 ArXiv Summary – {{ $now.format(\"dd MMM yyyy\") }}",
+        "message": "={{ $json.data }} \n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        26580,
+        5220
+      ],
+      "id": "3edf03bd-9b41-4672-acb2-10c44f57bf0e",
+      "name": "Gmail",
+      "webhookId": "9b69d4a4-3254-456c-a7bc-db444ea4cd0a"
+    },
+    {
+      "parameters": {
+        "mode": "markdownToHtml",
+        "markdown": "={{ $json.allSummaries }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.markdown",
+      "typeVersion": 1,
+      "position": [
+        26380,
+        5220
+      ],
+      "id": "d19d28b6-8ec7-4dbf-813a-7fa1cbbcb918",
+      "name": "Markdown"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Limit to first ": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Limit to first ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Markdown": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "70e8fd66-b67b-4c00-882a-e235efd76d71",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ae6e9c4cc37deb7843e8608dcd40b22f038a019b8ba630eab889e8c72021c8cf"
+  },
+  "id": "KkEoobt2f4jMQqcO",
+  "tags": []
+}
