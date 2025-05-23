@@ -1,0 +1,6 @@
+praw
+markdown
+requests
+python-dotenv
+feedparser
+sgmllib3k

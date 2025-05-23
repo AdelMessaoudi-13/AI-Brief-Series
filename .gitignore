@@ -1,0 +1,8 @@
+.DS_Store
+.n8n/
+node_modules/
+__pycache__/
+*.log
+*.bak
+.env
+reddit_oauth_setup.py
