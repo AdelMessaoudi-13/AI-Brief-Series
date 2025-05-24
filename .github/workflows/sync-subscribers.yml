@@ -23,7 +23,7 @@ jobs:
 
       - name: Create service_account.json
         run: |
-          echo "${{ secrets.GOOGLE_SERVICE_KEY }}" | python3 -c "import sys, json; print(json.dumps(json.loads(sys.stdin.read()), indent=2))" > service_account.json
+          echo "${{ secrets.GOOGLE_SERVICE_KEY }}" | sed 's/\\n/\n/g' > service_account.json
 
       - name: Run sync script
         run: python sync_subscribers.py
