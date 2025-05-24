@@ -19,11 +19,11 @@ jobs:
           python-version: '3.10'
 
       - name: Install dependencies
-        run: pip install gspread oauth2client jq
+        run: pip install gspread oauth2client
 
       - name: Create service_account.json
         run: |
-          echo "${{ secrets.GOOGLE_SERVICE_KEY }}" | jq '.' > service_account.json
+          echo "${{ secrets.GOOGLE_SERVICE_KEY }}" | sed 's/\\n/\n/g' > service_account.json
 
       - name: Run sync script
         run: python sync_subscribers.py
