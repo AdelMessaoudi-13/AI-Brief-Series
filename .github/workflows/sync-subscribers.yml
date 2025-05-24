@@ -2,7 +2,7 @@ name: Sync Subscribers
 
 on:
   schedule:
-    - cron: '0 14 * * *'  # chaque jour à 14h UTC
+    - cron: '0 14 * * *'
   workflow_dispatch:
 
 jobs:
