@@ -6,3 +6,4 @@ __pycache__/
 *.bak
 .env
 reddit_oauth_setup.py
+service_account.json

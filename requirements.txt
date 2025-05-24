@@ -4,3 +4,5 @@ requests
 python-dotenv
 feedparser
 sgmllib3k
+gspread
+oauth2client
