@@ -23,7 +23,7 @@ jobs:
 
       - name: Create service_account.json
         run: |
-          echo "${{ secrets.GOOGLE_SERVICE_KEY_BASE64 }}" | base64 --decode > service_account.json
+          echo '${{ secrets.GOOGLE_SERVICE_KEY }}' > service_account.json
 
       - name: Run sync script
         run: python sync_subscribers.py
