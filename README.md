@@ -1,5 +1,10 @@
 # 🧠 AI Brief Series – Autonomous AI Agents for Monitoring Artificial Intelligence
 
+<p align="center">
+  <img src="https://github.com/AdelMessaoudi-13/AI-Brief-Series/actions/workflows/daily-ai-news-summary.yml/badge.svg" alt="Daily Newsletter Status"/>
+  <img src="https://github.com/AdelMessaoudi-13/AI-Brief-Series/actions/workflows/sync-subscribers.yml/badge.svg" alt="Sync Subscribers Status"/>
+</p>
+
 A collection of intelligent agents designed to **collect**, **summarize**, and **distribute** key updates on artificial intelligence — from online discussions to scientific publications.
 
 ---
@@ -76,7 +81,7 @@ EMAIL_PASSWORD=your_gmail_app_password
 
 ---
 
-### 👥 Manage Subscribers
+### 👥 Manage Subscribers (Manually)
 
 List recipient emails in `subscribers.json`:
 
@@ -110,23 +115,11 @@ Want to receive a **daily email** summarizing the latest AI discussions and news
 ✅ No installation  
 ✅ Just one step:
 
-### ➕ How to Subscribe
+### ➕ Subscribe via this Google Form:
 
-1. Fork this repository  
-2. Add your email to the `subscribers.json` file:
+👉 https://forms.gle/PNEbdy7EBNYeDMZK6
 
-```json
-{
-  "subscribers": [
-    "your_email@example.com"
-  ]
-}
-```
-
-3. Submit a **Pull Request** with your changes  
-4. Once approved, you’ll start receiving the daily digest automatically
- 
-> You can unsubscribe at any time by removing your email and submitting a new PR.
+> Your email will be added automatically to the subscribers list within 24 hours.
 
 ---
 
@@ -148,6 +141,7 @@ You can import and run these workflows in [n8n](https://n8n.io/) (self-hosted or
 .
 ├── reddit_ai_news.py
 ├── venturebeat_ai_news.py
+├── sync_subscribers.py
 ├── subscribers.json
 ├── .env
 ├── requirements.txt
@@ -165,13 +159,8 @@ You can import and run these workflows in [n8n](https://n8n.io/) (self-hosted or
 - DeepSeek / Gemini (for summarization)  
 - Reddit API & RSS feeds  
 - Gmail SMTP  
+- gspread + Google Sheets API (for syncing form responses)  
 - n8n (for optional visual workflows)  
-
----
-
-## 🪪 License
-
-This project is licensed under the MIT License.
 
 ---
 
@@ -179,4 +168,4 @@ This project is licensed under the MIT License.
 
 **Adel Messaoudi**  
 📩 amessaoudi.am@gmail.com  
-🌍 [github.com/AdelMessaoudi-13](https://github.com/AdelMessaoudi-13)
+🌍 https://github.com/AdelMessaoudi-13
