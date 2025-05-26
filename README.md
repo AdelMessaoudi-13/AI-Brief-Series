@@ -1,4 +1,5 @@
-# 🧠 AI Brief Series – Autonomous AI Agents for Monitoring Artificial Intelligence
+# 🧠 AI Brief Series — Autonomous AI Agents for Tracking AI Trends
+
 
 <p align="center">
   <img src="https://github.com/AdelMessaoudi-13/AI-Brief-Series/actions/workflows/daily-ai-news-summary.yml/badge.svg" alt="Daily Newsletter Status"/>
@@ -58,7 +59,7 @@ You can run these scripts manually or customize them for your own workflows.
 ### 🔧 Prerequisites
 
 - Python 3.9+
-- Reddit API credentials
+- Reddit API credentials (see [how to obtain them](https://github.com/reddit-archive/reddit/wiki/OAuth2))
 - DeepSeek (or Gemini) API key
 - Gmail account with [App Password](https://myaccount.google.com/apppasswords)
 
@@ -66,7 +67,7 @@ You can run these scripts manually or customize them for your own workflows.
 
 ### 📄 Configuration – `.env` file
 
-Create a `.env` file at the root of the project with the following content:
+Create a `.env` file at the root of the project with the following content :
 
 ```
 REDDIT_CLIENT_ID=your_reddit_client_id
@@ -83,7 +84,7 @@ EMAIL_PASSWORD=your_gmail_app_password
 
 ### 👥 Manage Subscribers (Manually)
 
-List recipient emails in `subscribers.json`:
+List recipient emails in `subscribers.json` :
 
 ```json
 {
@@ -109,23 +110,23 @@ You can modify the prompts or integrate the scripts into your own pipelines.
 
 ## 📬 Receive the AI Newsletter (No Code Required)
 
-Want to receive a **daily email** summarizing the latest AI discussions and news?
+Want to receive a **daily email** summarizing the latest AI discussions and news ?
 
 ✅ No setup  
 ✅ No installation  
-✅ Just one step:
+✅ Just one step :
 
-### ➕ Subscribe via this Google Form:
+### ➕ Subscribe via this Google Form :
 
-👉 https://forms.gle/PNEbdy7EBNYeDMZK6
+👉 **[Click here to subscribe](https://forms.gle/PNEbdy7EBNYeDMZK6)**
 
 > Your email will be added automatically to the subscribers list within 24 hours.
 
 ---
 
-## 🧩 Optional: Visual Workflows with n8n
+## 🧩 Optional : Visual Workflows with n8n
 
-If you prefer a visual, low-code approach, this project includes an **n8n-based version** in the `n8n-version/` folder. It covers:
+If you prefer a visual, low-code approach, this project includes an **n8n-based version** in the `n8n-version/` folder. It covers :
 
 - Reddit AI Brief  
 - VentureBeat AI Brief  
